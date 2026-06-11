@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: bbf1ddcd357499d4a9727db3ca3b181b
+  - enabled: 1
+    path: Assets/Scenes/Cafe.unity
+    guid: 2227741ea5a8f8545bc6bfbdd2284e67
+  - enabled: 1
+    path: Assets/Scenes/Cha.unity
+    guid: 46255494b10bc754597051b0dfad7f66
+  - enabled: 1
+    path: Assets/Scenes/Memoria.unity
+    guid: 51ca386db19f8b64f9ad3d600fa57c48
+  - enabled: 1
+    path: Assets/Scenes/Memoria Hard.unity
+    guid: 6b198ac9b6ada81418604b130ccb1ff1
+  - enabled: 1
+    path: Assets/Scenes/Estatisticas.unity
+    guid: e909c32b9ee15e24f9f55290a8ca3f9c
+  m_configObjects:
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: df3a15d64f361204ab7a7a2788aaa274, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 1478e527a91dff948bb1aac1722ea814, type: 2}
+  m_UseUCBPForAssetBundles: 0
