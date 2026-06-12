@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
-using UnityEngine.XR.Interaction.Toolkit;
 
 public class TeaExerciseSequence : MonoBehaviour
 {
@@ -37,12 +36,20 @@ public class TeaExerciseSequence : MonoBehaviour
     private bool teaAdded = false;
     private bool sugarAdded = false;
 
+    private bool cupIsBeingHeld = false;
+
     private Coroutine hintCoroutine;
+    private Coroutine cupHeldCoroutine;
 
     private void Start()
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.StartExercise("Cha");
+
+        DisableAllHighlights();
+
+        if (waterVisual != null)
+            waterVisual.SetActive(false);
 
         ShowInstruction("Objetivo: Preparar uma chávena de chá.\nColoca a chávena no dispensador.");
         UpdateStepsUI();
@@ -114,6 +121,9 @@ public class TeaExerciseSequence : MonoBehaviour
     {
         yield return new WaitForSeconds(hintDelay);
 
+        if (currentStep == ExerciseStep.Concluido)
+            yield break;
+
         switch (currentStep)
         {
             case ExerciseStep.ColocarChavena:
@@ -147,6 +157,42 @@ public class TeaExerciseSequence : MonoBehaviour
                     RegisterHint();
                 }
                 break;
+        }
+    }
+
+    public void CupGrabbed()
+    {
+        Debug.Log("Chávena agarrada.");
+
+        if (currentStep != ExerciseStep.ColocarChavena)
+            return;
+
+        cupIsBeingHeld = true;
+
+        if (cupHeldCoroutine != null)
+            StopCoroutine(cupHeldCoroutine);
+
+        cupHeldCoroutine = StartCoroutine(ShowCupHighlightWhileHeld());
+    }
+
+    public void CupReleased()
+    {
+        Debug.Log("Chávena largada.");
+
+        cupIsBeingHeld = false;
+
+        if (cupHeldCoroutine != null)
+            StopCoroutine(cupHeldCoroutine);
+    }
+
+    IEnumerator ShowCupHighlightWhileHeld()
+    {
+        yield return new WaitForSeconds(hintDelay);
+
+        if (cupIsBeingHeld && currentStep == ExerciseStep.ColocarChavena && cupHighlight != null)
+        {
+            cupHighlight.SetActive(true);
+            RegisterHint();
         }
     }
 
@@ -194,13 +240,8 @@ public class TeaExerciseSequence : MonoBehaviour
         currentStep = ExerciseStep.AdicionarCha;
 
         UpdateStepsUI();
-        ShowInstruction("Água quente servida.\nAgora coloca o saco de chá.");
+        ShowInstruction("Água quente servida.\nAgora coloca o saco de chá na chávena.");
         StartHintTimer();
-    }
-
-    public void CupGrabbed()
-    {
-    Debug.Log("Chávena agarrada.");
     }
 
     public void AddTea(GameObject teaBag)
@@ -245,6 +286,8 @@ public class TeaExerciseSequence : MonoBehaviour
             Collider[] colliders = teaBag.GetComponentsInChildren<Collider>();
             foreach (var col in colliders)
                 col.enabled = false;
+
+            teaBag.SetActive(false);
         }
 
         if (teaCube != null)
@@ -253,7 +296,7 @@ public class TeaExerciseSequence : MonoBehaviour
         currentStep = ExerciseStep.AdicionarAcucar;
 
         UpdateStepsUI();
-        ShowInstruction("Saco de chá colocado.\nAgora adiciona o açúcar.");
+        ShowInstruction("Saco de chá colocado.\nAgora adiciona o açúcar na chávena.");
         StartHintTimer();
     }
 
@@ -291,15 +334,14 @@ public class TeaExerciseSequence : MonoBehaviour
 
         if (sugar != null)
         {
-            var grab = sugar.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-            if (grab != null)
-                grab.enabled = false;
-
             Rigidbody rb = sugar.GetComponent<Rigidbody>();
+
             if (rb != null)
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
             }
 
             Collider[] colliders = sugar.GetComponentsInChildren<Collider>();
@@ -322,7 +364,10 @@ public class TeaExerciseSequence : MonoBehaviour
         if (hintCoroutine != null)
             StopCoroutine(hintCoroutine);
 
-        PauseMenuManager pauseMenu = FindObjectOfType<PauseMenuManager>();
+        if (cupHeldCoroutine != null)
+            StopCoroutine(cupHeldCoroutine);
+
+        PauseMenuManager pauseMenu = FindFirstObjectByType<PauseMenuManager>();
 
         if (pauseMenu != null)
             pauseMenu.ShowPauseMenuAfterFinish();
