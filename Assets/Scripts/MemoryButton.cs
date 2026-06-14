@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 public class MemoryButton : MonoBehaviour
 {
@@ -8,37 +7,37 @@ public class MemoryButton : MonoBehaviour
     public MemoryGameManager gameManager;
 
     public Renderer buttonRenderer;
-
     public Material normalMaterial;
-    public Material sequenceMaterial; // cor quando o PC mostra a sequência
-    public Material playerMaterial;   // cor quando o utilizador carrega
+    public Material litMaterial;
+    public Material pressedMaterial;
 
     public float flashTime = 0.5f;
+    public float pressedFlashTime = 0.2f;
 
     public void PressButton()
     {
         Debug.Log("Botão pressionado: " + buttonIndex);
 
-        PlayerFlash();
-
         if (gameManager != null)
             gameManager.PlayerPressedButton(buttonIndex);
+
+        FlashPressed();
     }
 
     public void Flash()
     {
-        StartCoroutine(FlashRoutine(sequenceMaterial));
+        StartCoroutine(FlashRoutine());
     }
 
-    public void PlayerFlash()
+    public void FlashPressed()
     {
-        StartCoroutine(FlashRoutine(playerMaterial));
+        StartCoroutine(PressedRoutine());
     }
 
-    private IEnumerator FlashRoutine(Material materialToUse)
+    private IEnumerator FlashRoutine()
     {
-        if (buttonRenderer != null && materialToUse != null)
-            buttonRenderer.material = materialToUse;
+        if (buttonRenderer != null && litMaterial != null)
+            buttonRenderer.material = litMaterial;
 
         yield return new WaitForSeconds(flashTime);
 
@@ -46,8 +45,14 @@ public class MemoryButton : MonoBehaviour
             buttonRenderer.material = normalMaterial;
     }
 
-    public void OnXRSelectEntered(SelectEnterEventArgs args)
+    private IEnumerator PressedRoutine()
     {
-        PressButton();
+        if (buttonRenderer != null && pressedMaterial != null)
+            buttonRenderer.material = pressedMaterial;
+
+        yield return new WaitForSeconds(pressedFlashTime);
+
+        if (buttonRenderer != null && normalMaterial != null)
+            buttonRenderer.material = normalMaterial;
     }
 }

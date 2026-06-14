@@ -23,6 +23,7 @@ public class TeaExerciseSequence : MonoBehaviour
 
     [Header("Highlights")]
     public GameObject cupHighlight;
+    public GameObject dispensadorHighlight;
     public GameObject waterButtonHighlight;
     public GameObject teaBagHighlight;
     public GameObject sugarHighlight;
@@ -35,7 +36,6 @@ public class TeaExerciseSequence : MonoBehaviour
     private bool waterAdded = false;
     private bool teaAdded = false;
     private bool sugarAdded = false;
-
     private bool cupIsBeingHeld = false;
 
     private Coroutine hintCoroutine;
@@ -101,6 +101,7 @@ public class TeaExerciseSequence : MonoBehaviour
     void DisableAllHighlights()
     {
         if (cupHighlight != null) cupHighlight.SetActive(false);
+        if (dispensadorHighlight != null) dispensadorHighlight.SetActive(false);
         if (waterButtonHighlight != null) waterButtonHighlight.SetActive(false);
         if (teaBagHighlight != null) teaBagHighlight.SetActive(false);
         if (sugarHighlight != null) sugarHighlight.SetActive(false);
@@ -169,10 +170,13 @@ public class TeaExerciseSequence : MonoBehaviour
 
         cupIsBeingHeld = true;
 
+        if (cupHighlight != null)
+            cupHighlight.SetActive(false);
+
         if (cupHeldCoroutine != null)
             StopCoroutine(cupHeldCoroutine);
 
-        cupHeldCoroutine = StartCoroutine(ShowCupHighlightWhileHeld());
+        cupHeldCoroutine = StartCoroutine(ShowDispenserHighlightWhileHoldingCup());
     }
 
     public void CupReleased()
@@ -183,15 +187,20 @@ public class TeaExerciseSequence : MonoBehaviour
 
         if (cupHeldCoroutine != null)
             StopCoroutine(cupHeldCoroutine);
+
+        if (dispensadorHighlight != null)
+            dispensadorHighlight.SetActive(false);
     }
 
-    IEnumerator ShowCupHighlightWhileHeld()
+    IEnumerator ShowDispenserHighlightWhileHoldingCup()
     {
         yield return new WaitForSeconds(hintDelay);
 
-        if (cupIsBeingHeld && currentStep == ExerciseStep.ColocarChavena && cupHighlight != null)
+        if (cupIsBeingHeld &&
+            currentStep == ExerciseStep.ColocarChavena &&
+            dispensadorHighlight != null)
         {
-            cupHighlight.SetActive(true);
+            dispensadorHighlight.SetActive(true);
             RegisterHint();
         }
     }
@@ -200,6 +209,14 @@ public class TeaExerciseSequence : MonoBehaviour
     {
         if (currentStep != ExerciseStep.ColocarChavena)
             return;
+
+        if (dispensadorHighlight != null)
+            dispensadorHighlight.SetActive(false);
+
+        cupIsBeingHeld = false;
+
+        if (cupHeldCoroutine != null)
+            StopCoroutine(cupHeldCoroutine);
 
         cupPlaced = true;
         currentStep = ExerciseStep.AdicionarAgua;
