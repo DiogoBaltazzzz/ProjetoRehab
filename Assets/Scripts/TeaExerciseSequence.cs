@@ -68,12 +68,30 @@ public class TeaExerciseSequence : MonoBehaviour
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.AddError();
+
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayError();
     }
 
     void RegisterHint()
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.AddHint();
+
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayHint();
+    }
+
+    void PlayStepSound()
+    {
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayStepComplete();
+    }
+
+    void PlaySuccessSound()
+    {
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlaySuccess();
     }
 
     void UpdateStepsUI()
@@ -221,6 +239,8 @@ public class TeaExerciseSequence : MonoBehaviour
         cupPlaced = true;
         currentStep = ExerciseStep.AdicionarAgua;
 
+        PlayStepSound();
+
         UpdateStepsUI();
         ShowInstruction("Prime o botão de água quente.");
         StartHintTimer();
@@ -255,6 +275,8 @@ public class TeaExerciseSequence : MonoBehaviour
             waterVisual.SetActive(true);
 
         currentStep = ExerciseStep.AdicionarCha;
+
+        PlayStepSound();
 
         UpdateStepsUI();
         ShowInstruction("Água quente servida.\nAgora coloca o saco de chá na chávena.");
@@ -311,6 +333,8 @@ public class TeaExerciseSequence : MonoBehaviour
             teaCube.SetActive(false);
 
         currentStep = ExerciseStep.AdicionarAcucar;
+
+        PlayStepSound();
 
         UpdateStepsUI();
         ShowInstruction("Saco de chá colocado.\nAgora adiciona o açúcar na chávena.");
@@ -369,6 +393,8 @@ public class TeaExerciseSequence : MonoBehaviour
         }
 
         currentStep = ExerciseStep.Concluido;
+
+        PlaySuccessSound();
 
         UpdateStepsUI();
         ShowInstruction("Açúcar colocado.\nChá concluído com sucesso!");

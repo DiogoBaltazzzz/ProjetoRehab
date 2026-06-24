@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using TMPro;
 using System.Collections;
 
@@ -15,25 +14,35 @@ public class CoffeeExercise : MonoBehaviour
 
     public ExerciseStep currentStep = ExerciseStep.PegarChavena;
 
+    [Header("Visuals & UI")]
     public GameObject coffeeStream;
     public TextMeshProUGUI instructionText;
     public TextMeshProUGUI stepsText;
 
+    [Header("Highlights")]
     public GameObject cupHighlight;
     public GameObject machineHighlight;
     public GameObject buttonHighlight;
 
+    [Header("Settings")]
     public float hintDelay = 15f;
+    public float coffeeStreamDuration = 2f;
 
     private bool cupPlaced = false;
     private bool coffeeServed = false;
 
     private Coroutine hintCoroutine;
+    private Coroutine coffeeStreamCoroutine;
 
     private void Start()
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.StartExercise("Cafe");
+
+        DisableAllHighlights();
+
+        if (coffeeStream != null)
+            coffeeStream.SetActive(false);
 
         ShowInstruction("Objetivo: Preparar uma chávena de café.\nPega na chávena.");
         UpdateStepsUI();
@@ -52,12 +61,30 @@ public class CoffeeExercise : MonoBehaviour
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.AddError();
+
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayError();
     }
 
     void RegisterHint()
     {
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.AddHint();
+
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayHint();
+    }
+
+    void PlayStepSound()
+    {
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayStepComplete();
+    }
+
+    void PlaySuccessSound()
+    {
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlaySuccess();
     }
 
     void UpdateStepsUI()
@@ -103,6 +130,9 @@ public class CoffeeExercise : MonoBehaviour
     {
         yield return new WaitForSeconds(hintDelay);
 
+        if (currentStep == ExerciseStep.Concluido)
+            yield break;
+
         switch (currentStep)
         {
             case ExerciseStep.PegarChavena:
@@ -136,6 +166,9 @@ public class CoffeeExercise : MonoBehaviour
         if (currentStep == ExerciseStep.PegarChavena)
         {
             currentStep = ExerciseStep.ColocarNaMaquina;
+
+            PlayStepSound();
+
             UpdateStepsUI();
             ShowInstruction("Coloca a chávena na máquina.");
             StartHintTimer();
@@ -153,6 +186,8 @@ public class CoffeeExercise : MonoBehaviour
 
         cupPlaced = true;
         currentStep = ExerciseStep.PremirBotao;
+
+        PlayStepSound();
 
         UpdateStepsUI();
         ShowInstruction("Prime o botão para servir café.");
@@ -197,10 +232,20 @@ public class CoffeeExercise : MonoBehaviour
 
         coffeeServed = true;
 
+        if (coffeeStreamCoroutine != null)
+            StopCoroutine(coffeeStreamCoroutine);
+
+        coffeeStreamCoroutine = StartCoroutine(ServeCoffeeRoutine());
+    }
+
+    IEnumerator ServeCoffeeRoutine()
+    {
         if (coffeeStream != null)
             coffeeStream.SetActive(true);
 
         currentStep = ExerciseStep.Concluido;
+
+        PlaySuccessSound();
 
         UpdateStepsUI();
         ShowInstruction("Café servido! Exercício concluído.");
@@ -213,7 +258,12 @@ public class CoffeeExercise : MonoBehaviour
         if (hintCoroutine != null)
             StopCoroutine(hintCoroutine);
 
-        PauseMenuManager pauseMenu = FindObjectOfType<PauseMenuManager>();
+        yield return new WaitForSeconds(coffeeStreamDuration);
+
+        if (coffeeStream != null)
+            coffeeStream.SetActive(false);
+
+        PauseMenuManager pauseMenu = FindFirstObjectByType<PauseMenuManager>();
 
         if (pauseMenu != null)
             pauseMenu.ShowPauseMenuAfterFinish();

@@ -18,6 +18,9 @@ public class MemoryButton : MonoBehaviour
     {
         Debug.Log("Botão pressionado: " + buttonIndex);
 
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayStepComplete();
+
         if (gameManager != null)
             gameManager.PlayerPressedButton(buttonIndex);
 

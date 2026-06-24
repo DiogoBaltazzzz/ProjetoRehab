@@ -70,7 +70,9 @@ public class MemoryGameManager : MonoBehaviour
 
         foreach (int index in sequence)
         {
-            buttons[index].Flash();
+            if (buttons[index] != null)
+                buttons[index].Flash();
+
             yield return new WaitForSeconds(flashTime + timeBetweenFlashes);
         }
 
@@ -106,6 +108,9 @@ public class MemoryGameManager : MonoBehaviour
 
         Debug.Log("Correto!");
 
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlaySuccess();
+
         yield return new WaitForSeconds(1f);
 
         AddNewStep();
@@ -117,6 +122,12 @@ public class MemoryGameManager : MonoBehaviour
         playerTurn = false;
 
         Debug.Log("Errado! A sequência vai recomeçar.");
+
+        if (ExerciseStatsManager.instance != null)
+            ExerciseStatsManager.instance.AddError();
+
+        if (ExerciseAudioManager.instance != null)
+            ExerciseAudioManager.instance.PlayError();
 
         yield return new WaitForSeconds(1f);
 
