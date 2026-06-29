@@ -3,59 +3,112 @@ using UnityEngine;
 
 public class MemoryButton : MonoBehaviour
 {
-    public int buttonIndex;
-    public MemoryGameManager gameManager;
+    private MemoryGameManager gameManager;
+    private int buttonIndex;
 
+    [Header("Renderer")]
     public Renderer buttonRenderer;
-    public Material normalMaterial;
-    public Material litMaterial;
-    public Material pressedMaterial;
 
+    [Header("Materials")]
+    public Material normalMaterial;
+    public Material sequenceMaterial;
+    public Material playerPressedMaterial;
+
+    [Header("Timing")]
     public float flashTime = 0.5f;
     public float pressedFlashTime = 0.2f;
 
+    private Coroutine flashCoroutine;
+
+    private void Awake()
+    {
+        if (buttonRenderer == null)
+            buttonRenderer = GetComponent<Renderer>();
+    }
+
+    public void Setup(MemoryGameManager manager, int index)
+    {
+        gameManager = manager;
+        buttonIndex = index;
+
+        SetNormal();
+    }
+
+    public int GetIndex()
+    {
+        return buttonIndex;
+    }
+
     public void PressButton()
+{
+    Debug.Log("Botão pressionado pelo jogador: " + buttonIndex);
+
+    if (gameManager != null)
     {
-        Debug.Log("Botão pressionado: " + buttonIndex);
+        bool accepted = gameManager.PlayerPressedButton(this);
 
-        if (ExerciseAudioManager.instance != null)
-            ExerciseAudioManager.instance.PlayStepComplete();
+        if (accepted)
+        {
+            if (ExerciseAudioManager.instance != null)
+                ExerciseAudioManager.instance.PlayStepComplete();
 
-        if (gameManager != null)
-            gameManager.PlayerPressedButton(buttonIndex);
+            FlashPlayerPressed();
+        }
+    }
+    else
+    {
+        Debug.LogError("GameManager não foi configurado no botão: " + name);
+    }
+}
 
-        FlashPressed();
+    public void FlashSequence()
+    {
+        Debug.Log("Botão a piscar na sequência: " + buttonIndex);
+
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+
+        flashCoroutine = StartCoroutine(FlashRoutine(sequenceMaterial, flashTime));
     }
 
-    public void Flash()
+    public void FlashPlayerPressed()
     {
-        StartCoroutine(FlashRoutine());
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+
+        flashCoroutine = StartCoroutine(FlashRoutine(playerPressedMaterial, pressedFlashTime));
     }
 
-    public void FlashPressed()
+    public void SetNormal()
     {
-        StartCoroutine(PressedRoutine());
+        SetMaterial(normalMaterial);
     }
 
-    private IEnumerator FlashRoutine()
+    private IEnumerator FlashRoutine(Material flashMaterial, float duration)
     {
-        if (buttonRenderer != null && litMaterial != null)
-            buttonRenderer.material = litMaterial;
+        SetMaterial(flashMaterial);
 
-        yield return new WaitForSeconds(flashTime);
+        yield return new WaitForSeconds(duration);
 
-        if (buttonRenderer != null && normalMaterial != null)
-            buttonRenderer.material = normalMaterial;
+        SetNormal();
+
+        flashCoroutine = null;
     }
 
-    private IEnumerator PressedRoutine()
+    private void SetMaterial(Material material)
     {
-        if (buttonRenderer != null && pressedMaterial != null)
-            buttonRenderer.material = pressedMaterial;
+        if (buttonRenderer == null)
+        {
+            Debug.LogError("Button Renderer em falta no botão: " + name);
+            return;
+        }
 
-        yield return new WaitForSeconds(pressedFlashTime);
+        if (material == null)
+        {
+            Debug.LogError("Material em falta no botão: " + name);
+            return;
+        }
 
-        if (buttonRenderer != null && normalMaterial != null)
-            buttonRenderer.material = normalMaterial;
+        buttonRenderer.material = material;
     }
 }

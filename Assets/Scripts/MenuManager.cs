@@ -24,7 +24,7 @@ public class MenuManager : MonoBehaviour
     // Função para carregar o Exercício 4 (se aplicável)
     public void StartExercise4()
     {
-        SceneManager.LoadScene("Memoria Hard"); // Nome da cena do exercício 4
+        SceneManager.LoadScene("Memory Hard"); // Nome da cena do exercício 4
     }
 
     // Função para mostrar as estatísticas

@@ -17,6 +17,11 @@ public class StatisticsSceneUI : MonoBehaviour
 
     private void Start()
     {
+        LoadStatistics();
+    }
+
+    void LoadStatistics()
+    {
         string lastExercise = PlayerPrefs.GetString("LastExercise", "Sem exercício");
 
         float time = PlayerPrefs.GetFloat(lastExercise + "_Time", 0f);
@@ -24,24 +29,41 @@ public class StatisticsSceneUI : MonoBehaviour
         int hints = PlayerPrefs.GetInt(lastExercise + "_Hints", 0);
         int maxSequence = PlayerPrefs.GetInt(lastExercise + "_MaxSequence", 0);
 
-        exerciseNameText.text = GetReadableExerciseName(lastExercise);
+        Debug.Log("Último exercício: " + lastExercise);
+        Debug.Log("Tempo: " + time);
+        Debug.Log("Tentativas: " + attempts);
+        Debug.Log("Dicas: " + hints);
+        Debug.Log("MaxSequence: " + maxSequence);
 
-        timeLabelText.text = "Tempo";
-        timeValueText.text = time.ToString("F1") + "s";
+        SetText(exerciseNameText, GetReadableExerciseName(lastExercise));
 
-        attemptsLabelText.text = "Tentativas";
-        attemptsValueText.text = attempts.ToString();
+        SetText(timeLabelText, "Tempo");
+        SetText(timeValueText, time.ToString("F1") + "s");
+
+        SetText(attemptsLabelText, "Tentativas");
+        SetText(attemptsValueText, attempts.ToString());
 
         if (lastExercise == "Memoria" || lastExercise == "MemoriaHard")
         {
-            thirdLabelText.text = "Recorde";
-            thirdValueText.text = maxSequence.ToString();
+            SetText(thirdLabelText, "Recorde");
+            SetText(thirdValueText, maxSequence.ToString());
         }
         else
         {
-            thirdLabelText.text = "Dicas";
-            thirdValueText.text = hints.ToString();
+            SetText(thirdLabelText, "Dicas");
+            SetText(thirdValueText, hints.ToString());
         }
+    }
+
+    void SetText(TextMeshProUGUI textComponent, string value)
+    {
+        if (textComponent == null)
+        {
+            Debug.LogError("Campo TextMeshProUGUI não está ligado no Inspector.");
+            return;
+        }
+
+        textComponent.text = value;
     }
 
     string GetReadableExerciseName(string exerciseName)

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 using System.Collections;
 
 public class PauseMenuManager : MonoBehaviour
@@ -8,12 +7,10 @@ public class PauseMenuManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject exercisePanel;
 
-    private bool isPaused = false;
-
     private void Start()
     {
         if (pauseMenu != null)
-            pauseMenu.SetActive(false);
+            pauseMenu.SetActive(true);
 
         if (exercisePanel != null)
             exercisePanel.SetActive(true);
@@ -21,36 +18,10 @@ public class PauseMenuManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    private void Update()
-    {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (isPaused)
-                ResumeGame();
-            else
-                ShowPauseMenu();
-        }
-    }
-
-    public void ShowPauseMenu()
-    {
-        isPaused = true;
-
-        if (pauseMenu != null)
-            pauseMenu.SetActive(true);
-
-        if (exercisePanel != null)
-            exercisePanel.SetActive(false);
-
-        Time.timeScale = 0f;
-    }
-
     public void ResumeGame()
     {
-        isPaused = false;
-
         if (pauseMenu != null)
-            pauseMenu.SetActive(false);
+            pauseMenu.SetActive(true);
 
         if (exercisePanel != null)
             exercisePanel.SetActive(true);
@@ -77,7 +48,9 @@ public class PauseMenuManager : MonoBehaviour
 
     private IEnumerator OpenPauseMenuAfterDelay()
     {
-        yield return new WaitForSeconds(2f);
-        ShowPauseMenu();
+        yield return new WaitForSecondsRealtime(2f);
+
+        if (pauseMenu != null)
+            pauseMenu.SetActive(true);
     }
 }

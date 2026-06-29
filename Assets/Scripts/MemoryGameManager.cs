@@ -6,32 +6,37 @@ public class MemoryGameManager : MonoBehaviour
 {
     public string exerciseName = "Memoria";
 
+    [Header("Buttons")]
     public MemoryButton[] buttons;
 
+    [Header("Timing")]
     public float flashTime = 0.8f;
     public float timeBetweenFlashes = 0.4f;
+    public float inputCooldown = 0.35f;
 
     private List<int> sequence = new List<int>();
     private int playerIndex = 0;
     private bool playerTurn = false;
     private bool statsSaved = false;
+    private float lastInputTime = -999f;
 
     private void Start()
     {
+        SetupButtons();
+
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.StartExercise(exerciseName);
 
         StartGame();
     }
 
-    private void OnDisable()
+    void SetupButtons()
     {
-        SaveStats();
-    }
-
-    private void OnApplicationQuit()
-    {
-        SaveStats();
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] != null)
+                buttons[i].Setup(this, i);
+        }
     }
 
     void StartGame()
@@ -71,36 +76,58 @@ public class MemoryGameManager : MonoBehaviour
         foreach (int index in sequence)
         {
             if (buttons[index] != null)
-                buttons[index].Flash();
+            {
+                buttons[index].flashTime = flashTime;
+                buttons[index].FlashSequence();
+            }
 
             yield return new WaitForSeconds(flashTime + timeBetweenFlashes);
         }
 
         playerIndex = 0;
         playerTurn = true;
+        lastInputTime = -999f;
 
         Debug.Log("Repete a sequência.");
+        Debug.Log("Sequência esperada: " + string.Join(", ", sequence));
     }
 
-    public void PlayerPressedButton(int buttonIndex)
+    public bool PlayerPressedButton(MemoryButton button)
+{
+    if (!playerTurn)
     {
-        if (!playerTurn)
-            return;
-
-        Debug.Log("Botão pressionado: " + buttonIndex);
-
-        if (buttonIndex == sequence[playerIndex])
-        {
-            playerIndex++;
-
-            if (playerIndex >= sequence.Count)
-                StartCoroutine(HandleRoundSuccess());
-        }
-        else
-        {
-            StartCoroutine(HandleWrongAnswer());
-        }
+        Debug.Log("Clique ignorado: ainda não é a vez do jogador.");
+        return false;
     }
+
+    if (Time.time - lastInputTime < inputCooldown)
+    {
+        Debug.Log("Clique ignorado por cooldown.");
+        return false;
+    }
+
+    lastInputTime = Time.time;
+
+    int pressedIndex = button.GetIndex();
+    int expectedIndex = sequence[playerIndex];
+
+    Debug.Log("Jogador carregou: " + pressedIndex + " | Esperado: " + expectedIndex);
+
+    if (pressedIndex == expectedIndex)
+    {
+        playerIndex++;
+
+        if (playerIndex >= sequence.Count)
+            StartCoroutine(HandleRoundSuccess());
+
+        return true;
+    }
+    else
+    {
+        StartCoroutine(HandleWrongAnswer());
+        return true;
+    }
+}
 
     IEnumerator HandleRoundSuccess()
     {
@@ -143,5 +170,15 @@ public class MemoryGameManager : MonoBehaviour
 
         if (ExerciseStatsManager.instance != null)
             ExerciseStatsManager.instance.FinishExercise();
+    }
+
+    private void OnDisable()
+    {
+        SaveStats();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveStats();
     }
 }
