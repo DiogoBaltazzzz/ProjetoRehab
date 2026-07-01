@@ -5755,7 +5755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65bc7ec4ca8a1064297b470f5138089b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MemoryGameManager
-  exerciseName: Memoria
+  exerciseName: Memory Hard
   buttons:
   - {fileID: 1283976594}
   - {fileID: 695245012}

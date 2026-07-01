@@ -31,12 +31,18 @@ public class PauseMenuManager : MonoBehaviour
 
     public void RestartExercise()
     {
+        if (ExerciseStatsManager.instance != null)
+            ExerciseStatsManager.instance.FinishExercise();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void GoToMainMenu()
     {
+        if (ExerciseStatsManager.instance != null)
+            ExerciseStatsManager.instance.FinishExercise();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene("Menu");
     }

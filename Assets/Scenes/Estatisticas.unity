@@ -14122,13 +14122,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4922ba0cafb8f44ebcab9e183ff30f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatisticsSceneUI
-  exerciseNameText: {fileID: 0}
-  timeLabelText: {fileID: 0}
-  timeValueText: {fileID: 0}
-  attemptsLabelText: {fileID: 0}
-  attemptsValueText: {fileID: 0}
-  thirdLabelText: {fileID: 0}
-  thirdValueText: {fileID: 0}
+  exerciseNameText: {fileID: 1667406991}
+  timeLabelText: {fileID: 325328011}
+  timeValueText: {fileID: 938610924}
+  attemptsLabelText: {fileID: 588784677}
+  attemptsValueText: {fileID: 406290615}
+  thirdLabelText: {fileID: 1447930661}
+  thirdValueText: {fileID: 1866612025}
 --- !u!4 &1252155409
 Transform:
   m_ObjectHideFlags: 0
@@ -15663,8 +15663,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1866612024}
   - {fileID: 1447930660}
+  - {fileID: 1866612024}
   m_Father: {fileID: 1144037794}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

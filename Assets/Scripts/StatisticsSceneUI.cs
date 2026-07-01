@@ -27,11 +27,13 @@ public class StatisticsSceneUI : MonoBehaviour
         float time = PlayerPrefs.GetFloat(lastExercise + "_Time", 0f);
         int attempts = PlayerPrefs.GetInt(lastExercise + "_Attempts", 0);
         int hints = PlayerPrefs.GetInt(lastExercise + "_Hints", 0);
+        int errors = PlayerPrefs.GetInt(lastExercise + "_Errors", 0);
         int maxSequence = PlayerPrefs.GetInt(lastExercise + "_MaxSequence", 0);
 
         Debug.Log("Último exercício: " + lastExercise);
         Debug.Log("Tempo: " + time);
         Debug.Log("Tentativas: " + attempts);
+        Debug.Log("Erros: " + errors);
         Debug.Log("Dicas: " + hints);
         Debug.Log("MaxSequence: " + maxSequence);
 
@@ -43,7 +45,7 @@ public class StatisticsSceneUI : MonoBehaviour
         SetText(attemptsLabelText, "Tentativas");
         SetText(attemptsValueText, attempts.ToString());
 
-        if (lastExercise == "Memoria" || lastExercise == "MemoriaHard")
+        if (IsMemoryExercise(lastExercise))
         {
             SetText(thirdLabelText, "Recorde");
             SetText(thirdValueText, maxSequence.ToString());
@@ -53,6 +55,13 @@ public class StatisticsSceneUI : MonoBehaviour
             SetText(thirdLabelText, "Dicas");
             SetText(thirdValueText, hints.ToString());
         }
+    }
+
+    bool IsMemoryExercise(string exerciseName)
+    {
+        return exerciseName == "Memoria" ||
+               exerciseName == "MemoriaHard" ||
+               exerciseName == "Memory Hard";
     }
 
     void SetText(TextMeshProUGUI textComponent, string value)
@@ -72,12 +81,17 @@ public class StatisticsSceneUI : MonoBehaviour
         {
             case "Cafe":
                 return "Exercício Café";
+
             case "Cha":
                 return "Exercício Chá";
+
             case "Memoria":
                 return "Jogo da Memória";
+
             case "MemoriaHard":
+            case "Memory Hard":
                 return "Jogo da Memória Difícil";
+
             default:
                 return "Sem exercício realizado";
         }
